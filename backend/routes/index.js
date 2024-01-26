@@ -1,14 +1,10 @@
 const express = require('express');
+const userRouter = require('./user')
 const router = express.Router();
 
-router
-    .route('/')
-    .get((req, res)=>{
-        res.json({
-            message:"this is from /api/v1"
-        })
-    })
+router.use('/user', userRouter)
+router.get('/', (req, res)=>{
+    res.send("this is from index.js")
+})
 
-module.exports={
-    router
-}    
+module.exports=router
