@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken')
 const { User } = require('../db');
 const { JWT_SECRET } = require('../config');
 const userRouter = express.Router();
+const {authMiddleware} = require('../middleware.js')
 
 const signupBody = zod.object({
     username:zod.string(),
@@ -16,6 +17,27 @@ const signinBody = zod.object({
     username:zod.string(),
     password:zod.string()
 })
+
+const updateBody = zod.object({
+    password:zod.string().optional(),
+    firstName:zod.string().optional(),
+    lastName:zod.string().optional()
+})
+
+const updateUser = async(req, res) => {
+    const {success} = updateBody.safeParse(req.body);
+    if(!success){
+        res.status(411).json({
+            message:"Error while parsing the information!"
+        })
+    }
+
+    await User.updateOne(req.body, {_id:req.userId})
+    
+    res.json({
+        message:"Updated successfully!"
+    })
+}
 
 const postSignup = async(req, res) => {
     const {success} = signupBody.safeParse(req.body);
@@ -72,13 +94,46 @@ const postSignin = async(req, res) => {
     })
 }
 
+const getUser = async(req, res) => {
+    const filter = req.query.filter||"";
+
+    const users = await User.find({
+        $or:[{
+            firstName:{
+                "$regex":filter
+            }
+        },{
+            lastName:{
+                "$regex":filter
+            }
+        }]
+    })
+
+    res.json({
+        user:users.map(user=>({
+            username:user.username,
+            firstName:user.firstName,
+            lastName:user.lastName,
+            _id:user._id
+        }))
+    })
+}
+
+userRouter
+    .route('/')
+    .put(updateUser)
+
+userRouter
+    .route('/bulk')
+    .get(getUser)
+
 userRouter
     .route('/signup')
     .post(postSignup)
 
 userRouter
     .route('/signin')   
-    .post(postSignin) 
+    .post(authMiddleware, postSignin) 
 
 
 module.exports = userRouter
