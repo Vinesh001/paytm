@@ -40,6 +40,8 @@ const userSchema = new mongoose.Schema({
     }
 })
 
+const User = mongoose.model('User', userSchema);
+
 const accountSchema = new mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
@@ -54,7 +56,6 @@ const accountSchema = new mongoose.Schema({
 
 const Account = mongoose.model('Account', accountSchema);
 
-const User = mongoose.model('User', userSchema);
 
 module.exports = {
     User,
