@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const {JWT_SECRET} = require('./config.js')
+const {MONGO_URI} = require('./config.js')
 
-mongoose.connect(JWT_SECRET)
+mongoose.connect(MONGO_URI)
 .then(()=>{
     console.log('Database is connected!')
 })
