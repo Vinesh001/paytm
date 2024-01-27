@@ -26,12 +26,12 @@ export const Signin = () => {
             }} placeholder="viensh#4353ls" label={"Password"} />
         <div className="pt-4">
           <Button onClick={async()=>{
-            {console.log("vinesh")}
+            // {console.log("vinesh")}
                 const response = await axios.post('http://localhost:3000/api/v1/user/signin',{
                   username,
                   password
                 });
-                {console.log("vinehs")}
+                console.log("vinehs")
                 localStorage.setItem('token', response.data.token);
                 navigate('/dashboard')
               }} label={"Sign in"} />

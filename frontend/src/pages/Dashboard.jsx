@@ -5,7 +5,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react';
 
 export function Dashboard() {
-  const [userPersonalInfo, setUserPersonalInfo] = useState({});
+    const [userPersonalInfo, setUserPersonalInfo] = useState({});
     const [userAccountInfo, setUserAccountInfo] = useState({});
     useEffect(() => {
         const token = localStorage.getItem('token');
