@@ -71,6 +71,7 @@ const postSignup = async(req, res) => {
 
     res.json({
         message:"User created successfully",
+        id:user._id,
         token:token
     })
 }   
@@ -100,7 +101,7 @@ const postSignin = async(req, res) => {
     })
 }
 
-const getUser = async(req, res) => {
+const getUsers = async(req, res) => {
     const filter = req.query.filter||"";
 
     const users = await User.find({
@@ -125,13 +126,30 @@ const getUser = async(req, res) => {
     })
 }
 
+const getUser = async(req, res)=>{
+    console.log('vi')
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, JWT_SECRET);
+    const userId = decodedToken.userId;
+
+    const userData = await User.find({_id:userId});
+    const userAmount = await Account.find({userId});
+
+    console.log(userData, userAmount)
+    res.json({
+        userData,
+        userAmount
+    })
+}
+
 userRouter
     .route('/')
+    .get(getUser)
     .put(updateUser)
 
 userRouter
     .route('/bulk')
-    .get(getUser)
+    .get(getUsers)
 
 userRouter
     .route('/signup')
