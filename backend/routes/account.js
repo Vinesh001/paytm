@@ -12,10 +12,10 @@ const showBalance = async(req, res) => {
 }  
 
 const transferMoney = async(req, res) => {
-    
+    // console.log('vinesh')
     const session = await mongoose.startSession();
     session.startTransaction();
-
+    
     const {amount, to} = req.body;
     const account = await Account.findOne({userId:req.userId}).session(session)
     
@@ -25,8 +25,9 @@ const transferMoney = async(req, res) => {
             message:"Insufficient balance"
         })
     }
-
-    const toAccount = await Account.findOne({userId:to});
+    
+    const toAccount = await Account.findOne({userId:to}).session(session);
+    // console.log(to)
 
     if(!toAccount){
         await session.abortTransaction();
@@ -35,6 +36,7 @@ const transferMoney = async(req, res) => {
         })
     }
 
+    // console.log("success")
     await Account.updateOne({
         userId:req.userId
     },{
@@ -51,8 +53,9 @@ const transferMoney = async(req, res) => {
         }
     }).session(session)
 
+    // console.log("success")
     await session.commitTransaction();
-
+// console.log("success")
     res.json({
         message:"Transfer successfully!"
     })

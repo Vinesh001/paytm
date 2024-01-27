@@ -18,14 +18,14 @@ export function Dashboard() {
         .then((response) => {
             setUserPersonalInfo(response.data.userData[0]);
             setUserAccountInfo(response.data.userAmount[0]);
-            console.log(userAccountInfo)
-            console.log(userPersonalInfo)
+            // console.log(userAccountInfo)
+            // console.log(userPersonalInfo)
         })
       }, []);
   return (
     
     <div>
-      <Appbar name={userPersonalInfo.firstName}></Appbar>
+      <Appbar name={userPersonalInfo.firstName||"vinesh"}></Appbar>
       <div className='m-8'>
         <Balance value={userAccountInfo.balance}/>
         <Users/>
