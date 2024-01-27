@@ -43,8 +43,9 @@ function User({user}){
                 </div>
             </div>
             <div className="flex flex-col justify-center h-ful">
-                <div>
+                <div className="font-semibold">
                     {user.firstName} {user.lastName}
+
                 </div>
             </div>
         </div>

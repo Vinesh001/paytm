@@ -66,7 +66,7 @@ const postSignup = async(req, res) => {
 
     await Account.create({
         userId,
-        balance:1+Math.random()*10000
+        balance:1+Math.floor(Math.random()*10000)
     })
 
     res.json({
@@ -77,6 +77,7 @@ const postSignup = async(req, res) => {
 }   
 
 const postSignin = async(req, res) => {
+    console.log('vineshback')
     const {success} = signinBody.safeParse(req.body);
     if(!success){
         return res.status(411).json({
@@ -97,6 +98,7 @@ const postSignin = async(req, res) => {
     const token = jwt.sign({userId:userExist._id}, JWT_SECRET );
     res.status(200).json({
         token:token,
+        id:userExist._id,
         message:"User is successfully loggedin!"
     })
 }
@@ -157,7 +159,7 @@ userRouter
 
 userRouter
     .route('/signin')   
-    .post(authMiddleware, postSignin) 
+    .post( postSignin) 
 
 
 module.exports = userRouter
