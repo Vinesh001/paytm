@@ -2,9 +2,12 @@ import { useState, useEffect} from "react";
 import { Dashboard } from "./Dashboard";
 import { Signin } from "./Signin";
 import axios from 'axios'
+import { useNavigate } from "react-router-dom";
 
 
 export const InitialPage=()=> {
+
+    const navigate = useNavigate();
     const [user, setUser] = useState();
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -16,8 +19,6 @@ export const InitialPage=()=> {
         })
         .then((response) => {
             setUser(response.data.userData[0].firstName);
-            // console.log(userAccountInfo)
-            // console.log(userPersonalInfo)
         })
       }, []);
   return (
@@ -29,17 +30,19 @@ export const InitialPage=()=> {
 
 function Check({user}){
     if(user){
-        return(
-            <>
-            <Dashboard></Dashboard>
-            </>
-        )
+      return(
+        <>
+
+        <Dashboard/>
+        </>
+      )
+        
     }
     else{
-        return(
-            <>
-            <Signin></Signin>
-            </>
-        )
+      return(
+        <>
+        <Signin/>
+        </>
+      )
     }
 }

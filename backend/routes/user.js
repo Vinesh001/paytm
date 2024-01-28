@@ -25,82 +25,99 @@ const updateBody = zod.object({
 })
 
 const updateUser = async(req, res) => {
-    const {success} = updateBody.safeParse(req.body);
-    if(!success){
-        res.status(411).json({
-            message:"Error while parsing the information!"
+    try{
+        const {success} = updateBody.safeParse(req.body);
+        if(!success){
+            res.status(411).json({
+                message:"Error while parsing the information!"
+            })
+        }
+    
+        await User.updateOne(req.body, {_id:req.userId})
+        
+        res.json({
+            message:"Updated successfully!"
+        })
+    }catch(error){
+        res.json({
+            message:error.message
         })
     }
-
-    await User.updateOne(req.body, {_id:req.userId})
-    
-    res.json({
-        message:"Updated successfully!"
-    })
 }
 
 const postSignup = async(req, res) => {
-    const {success} = signupBody.safeParse(req.body);
-    if(!success){
-        res.status(411).json({
-            message:"Incorrect inputs"
+    try{
+        const {success} = signupBody.safeParse(req.body);
+        if(!success){
+            res.status(411).json({
+                message:"Incorrect inputs"
+            })
+        }
+        const existingUser = await User.findOne({username:req.body.username});
+        if(existingUser){
+            return res.status(411).json({
+                message:"This email is already taken by someone or the email entered is wrong!"
+            })
+        }
+        const {username, password, firstName, lastName}= req.body;
+        const user = await User.create({
+            username,
+            password,
+            firstName,
+            lastName
         })
-    }
-    const existingUser = await User.findOne({username:req.body.username});
-    if(existingUser){
-        return res.status(411).json({
-            message:"This email is already taken by someone or the email entered is wrong!"
-        })
-    }
-    const {username, password, firstName, lastName}= req.body;
-    const user = await User.create({
-        username,
-        password,
-        firstName,
-        lastName
-    })
-
+        
+        const userId = user._id;
+        const token = jwt.sign({ userId }, JWT_SECRET);
     
-    const userId = user._id;
-    const token = jwt.sign({ userId }, JWT_SECRET);
-
-    await Account.create({
-        userId,
-        balance:1+Math.floor(Math.random()*10000)
-    })
-
-    res.json({
-        message:"User created successfully",
-        id:user._id,
-        token:token
-    })
+        await Account.create({
+            userId,
+            balance:1+Math.floor(Math.random()*10000)
+        })
+    
+        res.json({
+            message:"User created successfully",
+            id:user._id,
+            token:token
+        })
+    }catch(error){
+        res.json({
+            message:error.message
+        })
+    }
 }   
 
 const postSignin = async(req, res) => {
     console.log('vineshback')
-    const {success} = signinBody.safeParse(req.body);
-    if(!success){
-        return res.status(411).json({
-            message:"Inputs are wrong!"
+    try{
+        const {success} = signinBody.safeParse(req.body);
+        if(!success){
+            return res.status(411).json({
+                message:"Inputs are wrong!"
+            })
+        }
+    
+        const {username, password} = req.body;
+    
+        const userExist = await User.findOne({username, password});
+    
+        if(!userExist){
+            return res.status(411).json({
+                message:"Use doesnot exist with this email!"
+            })
+        }
+    
+        const token = jwt.sign({userId:userExist._id}, JWT_SECRET );
+        res.status(200).json({
+            token:token,
+            id:userExist._id,
+            message:"User is successfully loggedin!"
+        })
+    }catch(error){
+        res.json({
+            message:error.message
         })
     }
-
-    const {username, password} = req.body;
-
-    const userExist = await User.findOne({username, password});
-
-    if(!userExist){
-        return res.status(411).json({
-            message:"Use doesnot exist with this email!"
-        })
-    }
-
-    const token = jwt.sign({userId:userExist._id}, JWT_SECRET );
-    res.status(200).json({
-        token:token,
-        id:userExist._id,
-        message:"User is successfully loggedin!"
-    })
 }
 
 const getUsers = async(req, res) => {
@@ -130,18 +147,24 @@ const getUsers = async(req, res) => {
 
 const getUser = async(req, res)=>{
     console.log('vi')
-    const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, JWT_SECRET);
-    const userId = decodedToken.userId;
-
-    const userData = await User.find({_id:userId});
-    const userAmount = await Account.find({userId});
-
-    console.log(userData, userAmount)
-    res.json({
-        userData,
-        userAmount
-    })
+    try{
+        const token = req.headers.authorization.split(' ')[1];
+        const decodedToken = jwt.verify(token, JWT_SECRET);
+        const userId = decodedToken.userId;
+    
+        const userData = await User.find({_id:userId});
+        const userAmount = await Account.find({userId});
+    
+        console.log(userData, userAmount)
+        res.json({
+            userData,
+            userAmount
+        })
+    }catch(error){
+        res.json({
+            message:error.message
+        })
+    }
 }
 
 userRouter

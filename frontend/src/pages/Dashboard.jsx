@@ -24,7 +24,7 @@ export function Dashboard() {
       }, []);
   return (
     
-    <div>
+    <div >
       <Appbar name={userPersonalInfo.firstName||"vinesh"}></Appbar>
       <div className='m-8'>
         <Balance value={userAccountInfo.balance}/>
